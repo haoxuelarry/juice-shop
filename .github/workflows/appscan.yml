@@ -48,7 +48,7 @@ jobs:
           TENABLE_IO_ACCESS_KEY: ${{ secrets.TENABLE_IO_ACCESS_KEY }}
           TENABLE_IO_SECRET_KEY: ${{ secrets.TENABLE_IO_SECRET_KEY }}
         run: |
-          docker run \
+          docker run --add-host=myapp:host-gateway \
             -e WAS_MODE=cicd \
             -e ACCESS_KEY=${{ env.TENABLE_IO_ACCESS_KEY }} \
             -e SECRET_KEY=${{ env.TENABLE_IO_SECRET_KEY }} \
