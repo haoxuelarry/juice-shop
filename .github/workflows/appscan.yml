@@ -18,9 +18,10 @@ jobs:
         with:
           node-version: '22.x'
           cache: 'npm'
+          cache-dependency-path: './package-lock.json'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Start web application
         run: npm start &
@@ -48,9 +49,30 @@ jobs:
           TENABLE_IO_ACCESS_KEY: ${{ secrets.TENABLE_IO_ACCESS_KEY }}
           TENABLE_IO_SECRET_KEY: ${{ secrets.TENABLE_IO_SECRET_KEY }}
         run: |
-          docker run --add-host=target-web:host-gateway \
+          docker run --name scanner-container --add-host=myapp:host-gateway \
             -e WAS_MODE=cicd \
             -e ACCESS_KEY=${{ env.TENABLE_IO_ACCESS_KEY }} \
             -e SECRET_KEY=${{ env.TENABLE_IO_SECRET_KEY }} \
             -v ./:/scanner \
-            tenable/was-scanner:latest
+            tenable/was-scanner:latest &
+          
+          # Stream logs in real-time
+          docker logs -f scanner-container
+
+      - name: Check scanner logs
+        if: always()
+        run: |
+          if [ -f scanner.log ]; then
+            echo "=== Scanner Log ===" 
+            cat scanner.log
+          else
+            echo "scanner.log not found"
+          fi
+
+      - name: Upload scanner logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scanner-logs
+          path: scanner.log
+          if-no-files-found: warn
