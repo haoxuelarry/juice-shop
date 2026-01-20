@@ -3,6 +3,7 @@ name: Tenable WAS-Scanner
 on:
   push:
     branches: [ develop, main ]
+  workflow_dispatch:
 
 jobs:
   scan:
