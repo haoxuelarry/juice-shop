@@ -49,15 +49,12 @@ jobs:
           TENABLE_IO_ACCESS_KEY: ${{ secrets.TENABLE_IO_ACCESS_KEY }}
           TENABLE_IO_SECRET_KEY: ${{ secrets.TENABLE_IO_SECRET_KEY }}
         run: |
-          docker run --name scanner-container --add-host=myapp:host-gateway \
+          docker run --add-host=myapp:host-gateway \
             -e WAS_MODE=cicd \
             -e ACCESS_KEY=${{ env.TENABLE_IO_ACCESS_KEY }} \
             -e SECRET_KEY=${{ env.TENABLE_IO_SECRET_KEY }} \
             -v ./:/scanner \
-            tenable/was-scanner:latest &
-          
-          # Stream logs in real-time
-          docker logs -f scanner-container
+            tenable/was-scanner:latest
 
       - name: Check scanner logs
         if: always()
